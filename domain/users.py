@@ -1,7 +1,9 @@
 from application.users import User
 
 def parse_user(user: User) -> dict:
-    return dict(user)
+    new_user = dict(user)
+    del new_user["id"]
+    return new_user
 
 def user_entity(user) -> dict:
     res = {}
