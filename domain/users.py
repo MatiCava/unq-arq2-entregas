@@ -1,3 +1,8 @@
+from application.users import User
+
+def parse_user(user: User) -> dict:
+    return dict(user)
+
 def user_entity(user) -> dict:
     res = {}
     if user is not None:    
