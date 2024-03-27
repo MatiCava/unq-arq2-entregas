@@ -6,3 +6,4 @@ client = MongoClient(settings.MONGO_DB)
 db = client.users_db
 collection_users = db["users_collection"]
 collection_products = db["products_collection"]
+collection_sellers = db["sellers_collection"]

@@ -1,11 +1,11 @@
 from typing import Any
 from bson import ObjectId
 from pymongo import CursorType
-from domain.product_repo_interface import IProduct_repo
+from domain.repo_interface import IRepo
 from config.db import client, collection_products
 from application.products import Product
 
-class product_repo(IProduct_repo):
+class product_repo(IRepo):
     
     def get_all() -> CursorType:
         return collection_products.find()
@@ -24,3 +24,7 @@ class product_repo(IProduct_repo):
     
     def delete(id: ObjectId) -> None:
         collection_products.find_one_and_delete({"_id": id})
+
+    def create_many(new_prods: dict) -> list[Product]:
+        inserted_ids = collection_products.insert_many(new_prods).inserted_ids
+        return list(collection_products.find({"_id": {"$in": inserted_ids}}))

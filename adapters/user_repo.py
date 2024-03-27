@@ -1,11 +1,11 @@
 from typing import Any
 from bson import ObjectId
 from pymongo import CursorType
-from domain.user_repo_interface import IUser_repo
+from domain.repo_interface import IRepo
 from config.db import client, collection_users
 from application.users import User
 
-class user_repo(IUser_repo):
+class user_repo(IRepo):
     
     def get_all() -> CursorType:
         return collection_users.find()

@@ -18,3 +18,7 @@ class product_service:
     
     def delete(id: str) -> None:
         product_repo.delete(ObjectId(id))
+
+    def create_many(prods: list[Product]) -> list[Product]:
+        new_products = [parse_product(prod) for prod in prods]
+        return product_repo.create_many(new_products)
