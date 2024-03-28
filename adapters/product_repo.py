@@ -28,6 +28,3 @@ class product_repo(IRepo):
     def create_many(new_prods: dict) -> list[Product]:
         inserted_ids = collection_products.insert_many(new_prods).inserted_ids
         return list(collection_products.find({"_id": {"$in": inserted_ids}}))
-    
-    def update_many(prods_ids: list, seller_id: str) -> None:
-        collection_products.update_many({"_id": {"$in": prods_ids}}, {"$set": {"seller_id": seller_id}})
