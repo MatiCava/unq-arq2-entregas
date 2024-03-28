@@ -7,4 +7,4 @@ class Product(BaseModel):
     description: str
     price: int
     stock: int
-    #seller id
+    seller_id: str

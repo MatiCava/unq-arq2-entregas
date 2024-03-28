@@ -8,12 +8,15 @@ def parse_seller(seller: Seller) -> dict:
 
 def seller_entity(seller) -> dict:
     res = {}
+    prods = []
     if seller is not None:    
+        if "list_products" in seller:
+            prods = list_serial_prod(seller["list_products"])
         res = {
             "id": str(seller["_id"]),
             "email": seller["email"],
             "razon_social": seller["razon_social"],
-            "list_products": list_serial_prod(seller["list_products"])
+            "list_products": prods
         }
     return res
 

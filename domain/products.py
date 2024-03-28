@@ -7,14 +7,20 @@ def parse_product(prod: Product) -> dict:
 
 def prod_entity(prod) -> dict:
     res = {}
+    prod_id = ''
     #falta seller id
-    if prod is not None:    
+    if prod is not None:
+        if "_id" in prod:
+            prod_id = str(prod["_id"])
+        else:
+            prod_id = prod["id"]
         res = {
-            "id": str(prod["_id"]),
+            "id": prod_id,
             "name": prod["name"],
             "description": prod["description"],
             "price": prod["price"],
-            "stock": prod["stock"]
+            "stock": prod["stock"],
+            "seller_id": prod["seller_id"]
         }
     return res
 

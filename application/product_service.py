@@ -8,6 +8,8 @@ class product_service:
         return list_serial_prod(product_repo.get_all())
 
     def create(prod: Product) -> dict:
+        #checkear que se guarde seller_id cuando creen productos
+        #hay que checkear que exista el seller id que mandan
         return prod_entity(product_repo.create(parse_product(prod)))
     
     def get(id: str) -> dict:
@@ -19,6 +21,10 @@ class product_service:
     def delete(id: str) -> None:
         product_repo.delete(ObjectId(id))
 
-    def create_many(prods: list[Product]) -> list[Product]:
-        new_products = [parse_product(prod) for prod in prods]
-        return product_repo.create_many(new_products)
+    def create_many(prods: list[Product], seller_id: str) -> list[Product]:
+        new_products = []
+        for prod in prods:
+            parsed_prod = parse_product(prod)
+            parsed_prod["seller_id"] = seller_id
+            new_products.append(parsed_prod)
+        return list_serial_prod(product_repo.create_many(new_products))
