@@ -28,3 +28,6 @@ class product_repo(IRepo):
     def create_many(new_prods: dict) -> list[Product]:
         inserted_ids = collection_products.insert_many(new_prods).inserted_ids
         return list(collection_products.find({"_id": {"$in": inserted_ids}}))
+
+    def delete_all(seller_id: str) -> None:
+        collection_products.delete_many({"seller_id": seller_id})

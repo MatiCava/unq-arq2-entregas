@@ -1,3 +1,4 @@
+from typing import Any
 from bson import ObjectId
 from application.sellers import Seller
 from application.product_service import product_service
@@ -24,12 +25,13 @@ class seller_service:
     
     def update(id: str, seller: Seller) -> dict:
         new_seller = parse_seller(seller)
-        #si viene vacio no actualizar
-        #tambien confirmar que si no se manda uno de los valores opcionales no pise los que ya tiene en db
         if not new_seller["list_products"]:
-            NotImplemented
+            del new_seller["list_products"]
         return seller_entity(seller_repo.update(ObjectId(id), new_seller))
 
     def delete(id: str) -> None:
-        #borrar productos del seller tambien
+        product_service.delete_all(id)
         seller_repo.delete(ObjectId(id))
+
+    def update_prods(id: str, prod: dict) -> None:
+        seller_repo.update_prods(ObjectId(id), prod)

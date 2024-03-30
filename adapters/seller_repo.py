@@ -19,10 +19,11 @@ class seller_repo(IRepo):
         return inserted_seller
     
     def update(id: ObjectId, seller: dict) -> Seller:
-        #hay que evitar que se pisen valores que son opcionales
         collection_sellers.find_one_and_update({"_id": id}, {"$set": seller})
         return collection_sellers.find_one({"_id": id})
     
     def delete(id: ObjectId) -> None:
-        #hay que eliminar productos tambien
         collection_sellers.find_one_and_delete({"_id": id})
+
+    def update_prods(id: ObjectId, prod: dict) -> None:
+        collection_sellers.update_one({"_id": id}, {"$push": {"list_products": prod}})
