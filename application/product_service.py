@@ -31,3 +31,6 @@ class product_service:
     
     def delete_all(seller_id: str) -> None:
         product_repo.delete_all(seller_id)
+
+    def update_prod_from_sale(prod_id: ObjectId, quantity: int) -> Product:
+        return product_repo.update_prod_from_sale(prod_id, quantity)

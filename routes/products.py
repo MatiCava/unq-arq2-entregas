@@ -13,7 +13,7 @@ def get_all_products():
 @products_router.post('/products', response_model=Product, tags=["Products"])
 def create_product(prod: Product):
     inserted_prod = product_service.create(prod)
-    seller_service.update_prods(inserted_prod["seller_id"], inserted_prod)
+    seller_service.insert_prod(inserted_prod["seller_id"], inserted_prod)
     return inserted_prod
 
 @products_router.get('/products/{id}', response_model=Product, tags=["Products"])
@@ -22,7 +22,9 @@ def get_product(id: str):
 
 @products_router.put('/products/{id}', response_model=Product, tags=["Products"])
 def update_product(id: str, prod: Product):
-    return product_service.update(id, prod)
+    updated_prod = product_service.update(id, prod)
+    seller_service.update_prod(updated_prod["seller_id"], updated_prod)
+    return updated_prod
 
 @products_router.delete('/products/{id}', status_code=HTTP_204_NO_CONTENT, tags=["Products"])
 def delete_product(id: str):

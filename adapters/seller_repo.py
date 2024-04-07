@@ -25,5 +25,11 @@ class seller_repo(IRepo):
     def delete(id: ObjectId) -> None:
         collection_sellers.find_one_and_delete({"_id": id})
 
-    def update_prods(id: ObjectId, prod: dict) -> None:
+    def insert_prod(id: ObjectId, prod: dict) -> None:
         collection_sellers.update_one({"_id": id}, {"$push": {"list_products": prod}})
+    
+    def update_prod(id: ObjectId, prod: dict) -> None:
+        collection_sellers.update_many({"_id": id}, {"$set": {"list_products.$[element]": prod}}, False, array_filters=[{"element.id": prod["id"]}])
+    
+    def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
+        collection_sellers.update_many({"_id": id}, {"$inc": {"list_products.$[element].stock": -quantity}}, False, array_filters=[{"element.id": prod_id}])

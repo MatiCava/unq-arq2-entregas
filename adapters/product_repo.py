@@ -31,3 +31,6 @@ class product_repo(IRepo):
 
     def delete_all(seller_id: str) -> None:
         collection_products.delete_many({"seller_id": seller_id})
+
+    def update_prod_from_sale(prod_id: ObjectId, quantity: int) -> Product:
+        return collection_products.find_one_and_update({"_id": prod_id}, {"$inc": {"stock": -quantity}})

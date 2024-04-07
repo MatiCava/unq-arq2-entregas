@@ -8,7 +8,6 @@ def parse_product(prod: Product) -> dict:
 def prod_entity(prod) -> dict:
     res = {}
     prod_id = ''
-    #falta seller id
     if prod is not None:
         if "_id" in prod:
             prod_id = str(prod["_id"])

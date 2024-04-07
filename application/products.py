@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class Product(BaseModel):
@@ -6,5 +6,5 @@ class Product(BaseModel):
     name: str
     description: str
     price: int
-    stock: int
+    stock: int = Field(ge=0)
     seller_id: str

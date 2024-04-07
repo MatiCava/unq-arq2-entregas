@@ -33,5 +33,11 @@ class seller_service:
         product_service.delete_all(id)
         seller_repo.delete(ObjectId(id))
 
-    def update_prods(id: str, prod: dict) -> None:
-        seller_repo.update_prods(ObjectId(id), prod)
+    def insert_prod(id: str, prod: dict) -> None:
+        seller_repo.insert_prod(ObjectId(id), prod)
+
+    def update_prod(id: str, prod: dict) -> None:
+        seller_repo.update_prod(ObjectId(id), prod)
+
+    def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
+        seller_repo.update_stock(id, prod_id, quantity)
