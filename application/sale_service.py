@@ -21,8 +21,7 @@ class sale_service:
                 if prod is not None:
                     seller_service.update_stock(ObjectId(prod["seller_id"]), info["product_id"], info["quantity"])
                     prods.append(prod)
-            
-            if len(new_sale["products_info"]) == prods:
+            if len(new_sale["products_info"]) == len(prods):
                 return sale_entity(sale_repo.create(new_sale))
             else:
                 error["error_msg"] = 'One of the products does not have enough stock or does not exist!'
