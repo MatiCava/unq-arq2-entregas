@@ -22,8 +22,8 @@ class product_repo(IRepo):
         collection_products.find_one_and_update({"_id": id}, {"$set": prod})
         return collection_products.find_one({"_id": id})
     
-    def delete(id: ObjectId) -> None:
-        collection_products.find_one_and_delete({"_id": id})
+    def delete(id: ObjectId) -> Product:
+        return collection_products.find_one_and_delete({"_id": id})
 
     def create_many(new_prods: dict) -> list[Product]:
         inserted_ids = collection_products.insert_many(new_prods).inserted_ids

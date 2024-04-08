@@ -32,5 +32,4 @@ def delete_user(id: str):
     result = user_service.delete(id)
     if "error_msg" in result:
         return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
-    else:
-        return Response(status_code=HTTP_204_NO_CONTENT)
+    return Response(status_code=HTTP_204_NO_CONTENT)

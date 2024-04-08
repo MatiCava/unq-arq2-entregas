@@ -9,7 +9,7 @@ class Sale_info(BaseModel):
 
 class Sale(BaseModel):
     id: Optional[str] = None
-    date: Optional[date]
+    date: Optional[date] #revisar esta poniendo siempre misma fecha
     status: Optional[Status_Enum] = Status_Enum.created
     user_id: str
     products_info: Optional[list[Sale_info]] = []

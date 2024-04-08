@@ -21,17 +21,21 @@ class seller_service:
         return parsed_inserted
     
     def get(id: str) -> dict:
-        return seller_entity(seller_repo.get(ObjectId(id)))
+        seller = seller_repo.get(ObjectId(id))
+        return seller_service.validate_seller(seller)
     
     def update(id: str, seller: Seller) -> dict:
         new_seller = parse_seller(seller)
-        if not new_seller["list_products"]:
-            del new_seller["list_products"]
-        return seller_entity(seller_repo.update(ObjectId(id), new_seller))
+        del new_seller["list_products"]
+        seller = seller_repo.update(ObjectId(id), new_seller)
+        return seller_service.validate_seller(seller)
 
-    def delete(id: str) -> None:
-        product_service.delete_all(id)
-        seller_repo.delete(ObjectId(id))
+    def delete(id: str) -> dict:
+        seller = seller_repo.delete(ObjectId(id))
+        result = seller_service.validate_seller(seller)
+        if "error_msg" not in result:
+            product_service.delete_all(id)
+        return result
 
     def insert_prod(id: str, prod: dict) -> None:
         seller_repo.insert_prod(ObjectId(id), prod)
@@ -41,3 +45,11 @@ class seller_service:
 
     def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
         seller_repo.update_stock(id, prod_id, quantity)
+    
+    def validate_seller(seller: Seller) -> dict:
+        error = {"error_msg": ''}
+        if seller is not None:
+            return seller_entity(seller)
+        else:
+            error["error_msg"] = 'Seller does not exist!'
+            return error

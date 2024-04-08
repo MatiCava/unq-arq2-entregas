@@ -22,8 +22,8 @@ class seller_repo(IRepo):
         collection_sellers.find_one_and_update({"_id": id}, {"$set": seller})
         return collection_sellers.find_one({"_id": id})
     
-    def delete(id: ObjectId) -> None:
-        collection_sellers.find_one_and_delete({"_id": id})
+    def delete(id: ObjectId) -> Seller:
+        return collection_sellers.find_one_and_delete({"_id": id})
 
     def insert_prod(id: ObjectId, prod: dict) -> None:
         collection_sellers.update_one({"_id": id}, {"$push": {"list_products": prod}})

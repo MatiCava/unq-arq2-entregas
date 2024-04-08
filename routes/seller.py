@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response
 from application.seller_service import seller_service
 from application.sellers import Seller
-from starlette.status import HTTP_204_NO_CONTENT
+from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 sellers_router = APIRouter()
 
@@ -15,13 +15,21 @@ def create_seller(seller: Seller):
 
 @sellers_router.get('/sellers/{id}', response_model=Seller, tags=["Sellers"])
 def get_seller(id: str):
-    return seller_service.get(id)
+    result = seller_service.get(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    return result
 
 @sellers_router.put('/sellers/{id}', response_model=Seller, tags=["Sellers"])
-def update_seller(id: str, prod: Seller):
-    return seller_service.update(id, prod)
+def update_seller(id: str, seller: Seller):
+    result = seller_service.update(id, seller)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    return result
 
 @sellers_router.delete('/sellers/{id}', status_code=HTTP_204_NO_CONTENT, tags=["Sellers"])
 def delete_seller(id: str):
-    seller_service.delete(id)
+    result = seller_service.delete(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
     return Response(status_code=HTTP_204_NO_CONTENT)

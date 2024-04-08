@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response
 from application.product_service import product_service
 from application.seller_service import seller_service
 from application.products import Product
-from starlette.status import HTTP_204_NO_CONTENT
+from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 products_router = APIRouter()
 
@@ -12,9 +12,12 @@ def get_all_products():
 
 @products_router.post('/products', response_model=Product, tags=["Products"])
 def create_product(prod: Product):
-    inserted_prod = product_service.create(prod)
-    seller_service.insert_prod(inserted_prod["seller_id"], inserted_prod)
-    return inserted_prod
+    result = seller_service.get(prod["seller_id"])
+    if "error_msg" not in result:
+        inserted_prod = product_service.create(prod)
+        seller_service.insert_prod(inserted_prod["seller_id"], inserted_prod)
+        return inserted_prod
+    return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
 
 @products_router.get('/products/{id}', response_model=Product, tags=["Products"])
 def get_product(id: str):
@@ -22,11 +25,16 @@ def get_product(id: str):
 
 @products_router.put('/products/{id}', response_model=Product, tags=["Products"])
 def update_product(id: str, prod: Product):
-    updated_prod = product_service.update(id, prod)
-    seller_service.update_prod(updated_prod["seller_id"], updated_prod)
-    return updated_prod
+    result = product_service.update(id, prod)
+    if "error_msg" not in result:
+        seller_service.update_prod(result["seller_id"], result)
+        return result
+    return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    
 
 @products_router.delete('/products/{id}', status_code=HTTP_204_NO_CONTENT, tags=["Products"])
 def delete_product(id: str):
-    product_service.delete(id)
+    result = product_service.delete(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
     return Response(status_code=HTTP_204_NO_CONTENT)

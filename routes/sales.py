@@ -32,5 +32,7 @@ def update_sale(id: str, sale: Sale):
 
 @sales_router.delete('/sales/{id}', status_code=HTTP_204_NO_CONTENT, tags=["Sales"])
 def delete_sale(id: str):
-    sale_service.delete(id)
+    result = sale_service.delete(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
     return Response(status_code=HTTP_204_NO_CONTENT)

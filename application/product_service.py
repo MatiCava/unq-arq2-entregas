@@ -8,18 +8,19 @@ class product_service:
         return list_serial_prod(product_repo.get_all())
 
     def create(prod: Product) -> dict: 
-        #hay que checkear que exista el seller id que mandan
-        #despues de checkear si existe seller lo actualizamos
         return prod_entity(product_repo.create(parse_product(prod)))
     
     def get(id: str) -> dict:
-        return prod_entity(product_repo.get(ObjectId(id)))
+        prod = product_repo.get(ObjectId(id))
+        return product_service.validate_product(prod)
     
     def update(id: str, prod: Product) -> dict:
-        return prod_entity(product_repo.update(ObjectId(id), parse_product(prod)))
+        updated_prod = product_repo.update(ObjectId(id), parse_product(prod))
+        return product_service.validate_product(updated_prod)
     
-    def delete(id: str) -> None:
-        product_repo.delete(ObjectId(id))
+    def delete(id: str) -> dict:
+        prod = product_repo.delete(ObjectId(id))
+        return product_service.validate_product(prod)
 
     def create_many(prods: list[Product], seller_id: str) -> list[Product]:
         new_products = []
@@ -34,3 +35,11 @@ class product_service:
 
     def update_prod_from_sale(prod_id: ObjectId, quantity: int) -> Product:
         return product_repo.update_prod_from_sale(prod_id, quantity)
+    
+    def validate_product(prod: Product) -> dict:
+        error = {"error_msg": ''}
+        if prod is not None:
+            return prod_entity(prod)
+        else:
+            error["error_msg"] = 'Product does not exist!'
+            return error
