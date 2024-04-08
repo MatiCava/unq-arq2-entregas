@@ -11,7 +11,7 @@ class user_repo(IRepo):
         return collection_users.find()
 
     def get(id: ObjectId) -> User:
-       return collection_users.find_one({"_id": id})
+        return collection_users.find_one({"_id": id})
 
     def create(new_user: dict) -> User:
         inserted_id = collection_users.insert_one(new_user).inserted_id
@@ -22,5 +22,5 @@ class user_repo(IRepo):
         collection_users.find_one_and_update({"_id": id}, {"$set": user})
         return collection_users.find_one({"_id": id})
     
-    def delete(id: ObjectId) -> None:
-        collection_users.find_one_and_delete({"_id": id})
+    def delete(id: ObjectId) -> User:
+        return collection_users.find_one_and_delete({"_id": id})

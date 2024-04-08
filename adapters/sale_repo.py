@@ -11,7 +11,7 @@ class sale_repo(IRepo):
         return collection_sales.find()
 
     def get(id: ObjectId) -> Sale:
-       return collection_sales.find_one({"_id": id})
+        return collection_sales.find_one({"_id": id})
 
     def create(new_sale: dict) -> Sale:
         inserted_id = collection_sales.insert_one(new_sale).inserted_id
@@ -22,5 +22,5 @@ class sale_repo(IRepo):
         collection_sales.find_one_and_update({"_id": id}, {"$set": sale})
         return collection_sales.find_one({"_id": id})
     
-    def delete(id: ObjectId) -> None:
-        collection_sales.find_one_and_delete({"_id": id})
+    def delete(id: ObjectId) -> Sale:
+        return collection_sales.find_one_and_delete({"_id": id})

@@ -32,4 +32,4 @@ class seller_repo(IRepo):
         collection_sellers.update_many({"_id": id}, {"$set": {"list_products.$[element]": prod}}, False, array_filters=[{"element.id": prod["id"]}])
     
     def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
-        collection_sellers.update_many({"_id": id}, {"$inc": {"list_products.$[element].stock": -quantity}}, False, array_filters=[{"element.id": prod_id}])
+        collection_sellers.update_many({"_id": id}, {"$inc": {"list_products.$[element].stock": -quantity}}, False, array_filters=[{"element.id": prod_id}, {"element.stock": {"$gte": quantity}}])

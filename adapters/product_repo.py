@@ -33,4 +33,4 @@ class product_repo(IRepo):
         collection_products.delete_many({"seller_id": seller_id})
 
     def update_prod_from_sale(prod_id: ObjectId, quantity: int) -> Product:
-        return collection_products.find_one_and_update({"_id": prod_id}, {"$inc": {"stock": -quantity}})
+        return collection_products.find_one_and_update({"$and": [{"_id": prod_id}, {"stock": {"$gte": quantity}}]}, {"$inc": {"stock": -quantity}})

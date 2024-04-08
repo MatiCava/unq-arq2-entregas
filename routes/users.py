@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response
 from application.user_service import user_service
 from application.users import User
-from starlette.status import HTTP_204_NO_CONTENT
+from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 users_router = APIRouter()
 
@@ -15,13 +15,22 @@ def create_user(user: User):
 
 @users_router.get('/users/{id}', response_model=User, tags=["Users"])
 def get_user(id: str):
-    return user_service.get(id)
+    result = user_service.get(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    return result
 
 @users_router.put('/users/{id}', response_model=User, tags=["Users"])
 def update_user(id: str, user: User):
-    return user_service.update(id, user)
+    result = user_service.update(id, user)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    return result
 
 @users_router.delete('/users/{id}', status_code=HTTP_204_NO_CONTENT, tags=["Users"])
 def delete_user(id: str):
-    user_service.delete(id)
-    return Response(status_code=HTTP_204_NO_CONTENT)
+    result = user_service.delete(id)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    else:
+        return Response(status_code=HTTP_204_NO_CONTENT)
