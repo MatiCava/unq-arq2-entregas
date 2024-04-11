@@ -17,7 +17,7 @@ class seller_service:
         if prods_insert:
             inserted_products = product_service.create_many(prods_insert, parsed_inserted["id"])
             parsed_inserted["list_products"] = inserted_products
-            return seller_service.update(parsed_inserted["id"], parsed_inserted)
+            return seller_repo.update(ObjectId(parsed_inserted["id"]), parsed_inserted)
         return parsed_inserted
     
     def get(id: str) -> dict:
@@ -43,8 +43,17 @@ class seller_service:
     def update_prod(id: str, prod: dict) -> None:
         seller_repo.update_prod(ObjectId(id), prod)
 
+    def delete_prod(id: str, prod_id: str) -> None:
+        seller_repo.delete_prod(ObjectId(id), prod_id)
+
     def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
         seller_repo.update_stock(id, prod_id, quantity)
+
+    def prods_ids_from_seller(seller: Seller) -> list:
+        prod_ids = []
+        for prod in seller["list_products"]:
+            prod_ids.append(prod["id"])
+        return prod_ids
     
     def validate_seller(seller: Seller) -> dict:
         error = {"error_msg": ''}

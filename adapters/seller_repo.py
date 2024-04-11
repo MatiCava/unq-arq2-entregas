@@ -28,8 +28,15 @@ class seller_repo(IRepo):
     def insert_prod(id: ObjectId, prod: dict) -> None:
         collection_sellers.update_one({"_id": id}, {"$push": {"list_products": prod}})
     
+    def delete_prod(id: ObjectId, prod_id: str) -> None:
+        collection_sellers.update_one({"_id": id}, {"$pull": {"list_products": {"id": prod_id}}})
+
     def update_prod(id: ObjectId, prod: dict) -> None:
         collection_sellers.update_many({"_id": id}, {"$set": {"list_products.$[element]": prod}}, False, array_filters=[{"element.id": prod["id"]}])
     
     def update_stock(id: ObjectId, prod_id: str, quantity: int) -> None:
-        collection_sellers.update_many({"_id": id}, {"$inc": {"list_products.$[element].stock": -quantity}}, False, array_filters=[{"element.id": prod_id, "element.stock": {"$gte": quantity}}])
+        query = {"element.id": prod_id}
+        if quantity < 0:
+            check = quantity * -1
+            query = {"element.id": prod_id, "element.stock": {"$gte": check}}
+        collection_sellers.update_many({"_id": id}, {"$inc": {"list_products.$[element].stock": quantity}}, False, array_filters=[query])

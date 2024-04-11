@@ -24,3 +24,6 @@ class sale_repo(IRepo):
     
     def delete(id: ObjectId) -> Sale:
         return collection_sales.find_one_and_delete({"_id": id})
+    
+    def get_sales_related_prod_ids(prod_ids: list) -> list[Sale]:
+        return list(collection_sales.find({"$and": [{"$or": [{"status": "created"}, {"status": "approved"}]}, {"products_info.product_id":  {"$in": prod_ids}}]}))
