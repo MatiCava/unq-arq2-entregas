@@ -8,8 +8,8 @@ from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_409
 products_router = APIRouter()
 
 @products_router.get('/products', response_model=list[Product], tags=["Products"])
-def get_all_products():
-    return product_service.get_all()
+def get_all_products(category: str | None = None, name: str | None = None, price: int | None = None, gte: int | None = None, lte: int | None = None):
+    return product_service.get_all(category, name, price, gte, lte)
 
 @products_router.post('/products', response_model=Product, tags=["Products"])
 def create_product(prod: Product):

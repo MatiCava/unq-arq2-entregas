@@ -7,8 +7,8 @@ from application.products import Product
 
 class product_repo(IRepo):
     
-    def get_all() -> CursorType:
-        return collection_products.find()
+    def get_all(query: dict) -> CursorType:
+        return collection_products.find(query)
 
     def get(id: ObjectId) -> Product:
        return collection_products.find_one({"_id": id})

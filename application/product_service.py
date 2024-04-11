@@ -4,8 +4,27 @@ from domain.products import list_serial_prod, prod_entity, parse_product
 from adapters.product_repo import product_repo
 
 class product_service:
-    def get_all() -> list:
-        return list_serial_prod(product_repo.get_all())
+    def get_all(category: str, name: str, price: int, gte: int, lte: int) -> list:
+        query = {}
+        if price:
+            query.update({"price": price})
+        if gte:
+            if lte:
+                check = { "$gte": gte, "$lte": lte }
+            else:
+                check = { "$gte": gte}
+            query.update({"price": check})
+        if lte:
+            if gte:
+                check = { "$gte": gte, "$lte": lte }
+            else:
+                check = { "$lte": lte}
+            query.update({"price": check})
+        if category:
+            query.update({"category": category})
+        if name:
+            query.update({"name": {"$regex": '.*' + name + '.*'}})
+        return list_serial_prod(product_repo.get_all(query))
 
     def create(prod: Product) -> dict: 
         return prod_entity(product_repo.create(parse_product(prod)))

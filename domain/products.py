@@ -17,6 +17,7 @@ def prod_entity(prod) -> dict:
             "id": prod_id,
             "name": prod["name"],
             "description": prod["description"],
+            "category": prod["category"],
             "price": prod["price"],
             "stock": prod["stock"],
             "seller_id": prod["seller_id"]
