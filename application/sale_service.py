@@ -18,9 +18,9 @@ class sale_service:
         user = user_service.get(new_sale["user_id"])
         if "error_msg" not in user:
             for info in new_sale["products_info"]:
-                prod = product_service.update_prod_from_sale(ObjectId(info["product_id"]), info["quantity"])
+                prod = product_service.update_prod_from_sale(ObjectId(info["product_id"]), -info["quantity"])
                 if prod is not None:
-                    seller_service.update_stock(ObjectId(prod["seller_id"]), info["product_id"], info["quantity"])
+                    seller_service.update_stock(ObjectId(prod["seller_id"]), info["product_id"], -info["quantity"])
                     prods.append(prod)
             if len(new_sale["products_info"]) == len(prods):
                 return sale_entity(sale_repo.create(new_sale))

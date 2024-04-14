@@ -2,7 +2,7 @@ from typing import Any
 from bson import ObjectId
 from pymongo import CursorType
 from domain.repo_interface import IRepo
-from config.db import client, collection_sales
+from config.db import collection_sales
 from application.sales import Sale
 
 class sale_repo(IRepo):

@@ -13,7 +13,7 @@ def get_all_products(category: str | None = None, name: str | None = None, price
 
 @products_router.post('/products', response_model=Product, tags=["Products"])
 def create_product(prod: Product):
-    result = seller_service.get(prod["seller_id"])
+    result = seller_service.get(dict(prod)["seller_id"])
     if "error_msg" not in result:
         inserted_prod = product_service.create(prod)
         seller_service.insert_prod(inserted_prod["seller_id"], inserted_prod)
