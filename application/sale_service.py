@@ -78,8 +78,15 @@ class sale_service:
         return error
 
     def delete(id: str) -> dict:
-        sale = sale_repo.delete(ObjectId(id))
-        return sale_service.validate_sale(sale)
+        deleted_sale = sale_repo.delete(ObjectId(id))
+        check_sale = sale_service.validate_sale(deleted_sale)
+        if "error_msg" in check_sale:
+            return check_sale
+        for info in check_sale["products_info"]:
+            result = sale_service.update_stocks(info["product_id"], info["quantity"])
+            if "error_msg" in result:
+                return result
+        return check_sale
     
     def get_sales_related_prod_ids(prod_ids: list) -> list:
         return sale_repo.get_sales_related_prod_ids(prod_ids)
