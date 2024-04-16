@@ -5,7 +5,7 @@ class Category_Enum(str, Enum):
     Agro = 'Agro'
     Alimentos = 'Alimentos'
     Mascotas = 'Mascotas'
-    Colleciones = 'Colleciones'
+    Colecciones = 'Colecciones'
     Arte = 'Arte'
     Tecnologia = 'Tecnologia'
     Deportes = 'Deportes'
