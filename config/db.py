@@ -16,9 +16,8 @@ def get_client():
 
 def mongo_db(client):
     global db
-    #se podria cambiar a meli_db y sacar users_db
     if db is None:
-        return client.users_db
+        return client.meli_db
         #return client.test_db
     return client.test_db
 
