@@ -37,11 +37,23 @@ class sale_service:
             else:
                 dict_prods.update({info["product_id"]:info["quantity"]})
         
+        print("dict_prods")
+        print(dict_prods)
+        print("actual_sale")
+        print(actual_sale["products_info"])
         for info in actual_sale["products_info"]:
+            print("prod a checkear")
+            print(info["product_id"])
             if info["product_id"] in dict_prods.keys():
                 actual_quantity = info["quantity"]
                 update_quantity = dict_prods[info["product_id"]]
                 new_quantity = actual_quantity - update_quantity
+                print("actual_quantity")
+                print(actual_quantity)
+                print("update_quantity")
+                print(update_quantity)
+                print("new_quantity")
+                print(new_quantity)
                 if actual_quantity != update_quantity and new_quantity < 0:
                     check_stock = sale_service.validate_prod_stock(info["product_id"], new_quantity)
                     if check_stock["error_msg"]:
@@ -49,7 +61,7 @@ class sale_service:
                 del dict_prods[info["product_id"]]
         if dict_prods:
             for prod_id in dict_prods.keys():
-                check_stock = sale_service.validate_prod_stock(prod_id, new_quantity)
+                check_stock = sale_service.validate_prod_stock(prod_id, dict_prods[prod_id])
                 if check_stock["error_msg"]:
                     return check_stock
         return Sale.update(id, sale, actual_sale)
@@ -71,6 +83,9 @@ class sale_service:
     def validate_prod_stock(prod_id: str, quantity: int) -> dict:
         error = {"error_msg": ''}
         prod = product_service.get(prod_id)
+        print(quantity)
+        print(prod)
+        print(prod["stock"] < quantity)
         if "error_msg" in prod:
             error["error_msg"] = prod["error_msg"]
         if prod["stock"] < quantity:
@@ -84,6 +99,8 @@ class sale_service:
             if quantity < 0:
                 quantity = quantity * -1
             error = sale_service.validate_prod_stock(info["product_id"], quantity)
+            if error["error_msg"]:
+                return error
         return error
     
     def validate_sale(sale: Sale) -> dict:
