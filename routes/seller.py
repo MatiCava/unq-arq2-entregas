@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response
 from application.seller_service import seller_service
 from application.sale_service import sale_service
-from application.sellers import Seller
+from domain.sellers import Seller
 from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT
 
 sellers_router = APIRouter()
@@ -35,10 +35,7 @@ def delete_seller(id: str):
         return Response(status_code=HTTP_400_BAD_REQUEST, headers=seller)
     prod_ids = seller_service.prods_ids_from_seller(seller)
     sales_related = sale_service.get_sales_related_prod_ids(prod_ids)
-    if not sales_related:
-        result = seller_service.delete(id)
-        if "error_msg" in result:
-            return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
-        return Response(status_code=HTTP_204_NO_CONTENT)
-    else:
-        return Response(status_code=HTTP_409_CONFLICT, headers={"error_msg": "There is at least one sale related to this seller!"})
+    result = seller_service.delete(id, sales_related)
+    if "error_msg" in result:
+        return Response(status_code=HTTP_400_BAD_REQUEST, headers=result)
+    return Response(status_code=HTTP_204_NO_CONTENT)

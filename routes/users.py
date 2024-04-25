@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response
 from application.user_service import user_service
-from application.users import User
+from domain.users import User
 from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 users_router = APIRouter()

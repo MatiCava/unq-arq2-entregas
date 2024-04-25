@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import pytest
 import mongomock
 from app import app
-from application.users import User
+from domain.users import User
 import config.db
 
 @pytest.fixture(autouse=True, scope='module')

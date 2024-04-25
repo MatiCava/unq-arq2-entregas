@@ -1,100 +1,95 @@
 from typing import Any
-from bson import ObjectId
-from application.sales import Sale
-from domain.sales import list_serial_sale, sale_entity, parse_sale
-from adapters.sale_repo import sale_repo
+from domain.sales import Sale
 from application.product_service import product_service
-from application.seller_service import seller_service
 from application.user_service import user_service
 
 class sale_service:
     def get_all() -> list:
-        return list_serial_sale(sale_repo.get_all())
+        return Sale.get_all()
 
     def create(sale: Sale) -> dict: 
-        new_sale = parse_sale(sale)
-        prods = []
+        new_sale = Sale.parse_sale(sale)
         error = {"error_msg": ''}
         user = user_service.get(new_sale["user_id"])
+        check_stock = sale_service.validate_stock(new_sale)
         if "error_msg" not in user:
-            for info in new_sale["products_info"]:
-                prod = product_service.update_prod_from_sale(ObjectId(info["product_id"]), -info["quantity"])
-                if prod is not None:
-                    seller_service.update_stock(ObjectId(prod["seller_id"]), info["product_id"], -info["quantity"])
-                    prods.append(prod)
-            if len(new_sale["products_info"]) == len(prods):
-                return sale_entity(sale_repo.create(new_sale))
+            if not check_stock["error_msg"]:
+                return Sale.create(new_sale)
             else:
-                error["error_msg"] = 'One of the products does not have enough stock or does not exist!'
+                error["error_msg"] = check_stock["error_msg"]    
         else:
             error["error_msg"] = user["error_msg"]
         return error
-    
+
     def get(id: str) -> dict:
-        sale = sale_repo.get(ObjectId(id))
-        return sale_service.validate_sale(sale)
+        res_sale = Sale.get(id)
+        return sale_service.validate_sale(res_sale)
     
     def update(id: str, sale: Sale) -> dict:
-        actual_sale = sale_repo.get(ObjectId(id))
-        check_sale = sale_service.validate_sale(actual_sale)
-        if "error_msg" in check_sale:
-            return check_sale
-        parsed_sale = parse_sale(sale)
+        actual_sale = sale_service.get(id)
+        if "error_msg" in actual_sale:
+            return actual_sale
+        parsed_sale = Sale.parse_sale(sale)
         dict_prods = {}
         for info in parsed_sale["products_info"]:
             if info["product_id"] in dict_prods.keys():
                 dict_prods[info["product_id"]] = dict_prods[info["product_id"]] + info["quantity"]
             else:
                 dict_prods.update({info["product_id"]:info["quantity"]})
+        
         for info in actual_sale["products_info"]:
             if info["product_id"] in dict_prods.keys():
                 actual_quantity = info["quantity"]
                 update_quantity = dict_prods[info["product_id"]]
-                if actual_quantity != update_quantity:
-                    new_quantity = actual_quantity - update_quantity
-                    result = sale_service.update_stocks(info["product_id"], new_quantity)
-                    if "error_msg" in result:
-                        return result
+                new_quantity = actual_quantity - update_quantity
+                if actual_quantity != update_quantity and new_quantity < 0:
+                    check_stock = sale_service.validate_prod_stock(info["product_id"], new_quantity)
+                    if check_stock["error_msg"]:
+                        return check_stock
                 del dict_prods[info["product_id"]]
-            else:
-                result = sale_service.update_stocks(info["product_id"], info["quantity"])
-                if "error_msg" in result:
-                    return result
         if dict_prods:
             for prod_id in dict_prods.keys():
-                result = sale_service.update_stocks(prod_id, -dict_prods[prod_id])
-                if "error_msg" in result:
-                    return result
-        updated_sale = sale_repo.update(ObjectId(id), parsed_sale)
-        return sale_entity(updated_sale)
-    
-    def update_stocks(prod_id: str, quantity: int) -> dict:
-        error = {}
-        prod = product_service.update_prod_from_sale(ObjectId(prod_id), quantity)
-        if prod is not None:
-            seller_service.update_stock(ObjectId(prod["seller_id"]), prod_id, quantity)
-        else:
-            error.update({"error_msg": 'Product does not exist!'})
-        return error
+                check_stock = sale_service.validate_prod_stock(prod_id, new_quantity)
+                if check_stock["error_msg"]:
+                    return check_stock
+        return Sale.update(id, sale, actual_sale)
 
     def delete(id: str) -> dict:
-        deleted_sale = sale_repo.delete(ObjectId(id))
+        deleted_sale = Sale.delete(id)
         check_sale = sale_service.validate_sale(deleted_sale)
         if "error_msg" in check_sale:
             return check_sale
         for info in check_sale["products_info"]:
-            result = sale_service.update_stocks(info["product_id"], info["quantity"])
+            result = Sale.update_stocks(info["product_id"], info["quantity"])
             if "error_msg" in result:
                 return result
         return check_sale
     
     def get_sales_related_prod_ids(prod_ids: list) -> list:
-        return sale_repo.get_sales_related_prod_ids(prod_ids)
+        return Sale.get_sales_related_prod_ids(prod_ids)
+    
+    def validate_prod_stock(prod_id: str, quantity: int) -> dict:
+        error = {"error_msg": ''}
+        prod = product_service.get(prod_id)
+        if "error_msg" in prod:
+            error["error_msg"] = prod["error_msg"]
+        if prod["stock"] < quantity:
+            error["error_msg"] = 'One of the products does not have enough stock or does not exist!'
+        return error
+
+    def validate_stock(sale: dict) -> dict:
+        error = {"error_msg": ''}
+        for info in sale["products_info"]:
+            quantity = info["quantity"]
+            if quantity < 0:
+                quantity = quantity * -1
+            error = sale_service.validate_prod_stock(info["product_id"], quantity)
+        return error
     
     def validate_sale(sale: Sale) -> dict:
         error = {"error_msg": ''}
         if sale is not None:
-            return sale_entity(sale)
+            return Sale.sale_entity(sale)
         else:
             error["error_msg"] = 'Sale does not exist!'
             return error

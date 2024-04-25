@@ -1,64 +1,43 @@
 from bson import ObjectId
-from application.products import Product
-from domain.products import list_serial_prod, prod_entity, parse_product
-from adapters.product_repo import product_repo
+from domain.products import Product
 
 class product_service:
     def get_all(category: str, name: str, price: int, gte: int, lte: int) -> list:
-        query = {}
-        if price:
-            query.update({"price": price})
-        if gte:
-            if lte:
-                check = { "$gte": gte, "$lte": lte }
-            else:
-                check = { "$gte": gte}
-            query.update({"price": check})
-        if lte:
-            if gte:
-                check = { "$gte": gte, "$lte": lte }
-            else:
-                check = { "$lte": lte}
-            query.update({"price": check})
-        if category:
-            query.update({"category": category})
-        if name:
-            query.update({"name": {"$regex": '.*' + name + '.*'}})
-        return list_serial_prod(product_repo.get_all(query))
+        return Product.get_all(category, name, price, gte, lte)
 
     def create(prod: Product) -> dict: 
-        return prod_entity(product_repo.create(parse_product(prod)))
+        return Product.create(prod)
     
     def get(id: str) -> dict:
-        prod = product_repo.get(ObjectId(id))
-        return product_service.validate_product(prod)
+        res_prod = Product.get(id)
+        return product_service.validate_product(res_prod)
     
     def update(id: str, prod: Product) -> dict:
-        updated_prod = product_repo.update(ObjectId(id), parse_product(prod))
-        return product_service.validate_product(updated_prod)
+        res_prod = Product.update(id, prod)
+        return product_service.validate_product(res_prod)
     
-    def delete(id: str) -> dict:
-        prod = product_repo.delete(ObjectId(id))
-        return product_service.validate_product(prod)
+    def delete(id: str, sales_related: list) -> dict:
+        error = {"error_msg": ''}
+        if not sales_related:
+            res_prod = Product.delete(id)
+            return product_service.validate_product(res_prod)
+        else:
+            error["error_msg"] = 'There is at least one sale related to this seller!'
+            return error
 
     def create_many(prods: list[Product], seller_id: str) -> list[Product]:
-        new_products = []
-        for prod in prods:
-            parsed_prod = parse_product(prod)
-            parsed_prod["seller_id"] = seller_id
-            new_products.append(parsed_prod)
-        return list_serial_prod(product_repo.create_many(new_products))
+        return Product.create_many(prods, seller_id)
     
     def delete_all(seller_id: str) -> None:
-        product_repo.delete_all(seller_id)
+        Product.delete_all(seller_id)
 
     def update_prod_from_sale(prod_id: ObjectId, quantity: int) -> Product:
-        return product_repo.update_prod_from_sale(prod_id, quantity)
+        return Product.update_prod_from_sale(prod_id, quantity)
     
     def validate_product(prod: Product) -> dict:
         error = {"error_msg": ''}
         if prod is not None:
-            return prod_entity(prod)
+            return Product.prod_entity(prod)
         else:
             error["error_msg"] = 'Product does not exist!'
             return error

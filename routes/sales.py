@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response
 from application.sale_service import sale_service
-from application.sales import Sale
+from domain.sales import Sale
 from starlette.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 
 sales_router = APIRouter()
